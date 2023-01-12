@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using PhoneBookWebAPI.Models.Context;
 using PhoneBookWebAPI.Models.Dtos;
 using PhoneBookWebAPI.Models.Entities;
+using ServiceStack.Redis.Generic;
+using ServiceStack.Redis;
+using System;
 
 namespace PhoneBookWebAPI.Controllers
 {
@@ -15,9 +18,10 @@ namespace PhoneBookWebAPI.Controllers
         private readonly PhoneBookDbContext _context;
         private readonly IMapper _mapper;
 
-        public PhoneBooksController(PhoneBookDbContext phoneBookDbContext)
+        public PhoneBooksController(PhoneBookDbContext phoneBookDbContext, IMapper mapper)
         {
             _context = phoneBookDbContext;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -27,6 +31,8 @@ namespace PhoneBookWebAPI.Controllers
 
             await _context.phoneBooks.AddAsync(phoneBook);
             await _context.SaveChangesAsync();
+
+            RemoveCache("phoneBooks");
 
             return Ok("Kayıt işlemi başarılı");
         }
@@ -41,6 +47,8 @@ namespace PhoneBookWebAPI.Controllers
 
             await _context.SaveChangesAsync();
 
+            RemoveCache("phoneBooks");
+
             return Ok("Güncelleme işlemi başarılı");
         }
 
@@ -52,15 +60,34 @@ namespace PhoneBookWebAPI.Controllers
             _context.Remove(phoneBook);
             await _context.SaveChangesAsync();
 
+            RemoveCache("phoneBooks");
+
             return Ok("Silme işlemi başarılı");
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            List<PhoneBook> phoneBook = await _context.phoneBooks.Include(p=> p.contactInformations).ToListAsync();
 
-            return Ok(phoneBook);
+            var redisclient = new RedisClient("localhost", 6379);
+            IRedisTypedClient<List<PhoneBook>> phoneBooks = redisclient.As<List<PhoneBook>>();
+
+            List<PhoneBook> phoneBooksList = redisclient.Get<List<PhoneBook>>("phoneBooks");
+            if (phoneBooksList == null)
+            {
+                phoneBooksList = await _context.phoneBooks.Include(p => p.contactInformations).ToListAsync();
+                redisclient.Set<List<PhoneBook>>("phoneBooks", phoneBooksList);
+            }
+
+            return Ok(phoneBooksList);
+        }
+
+        void RemoveCache(string key)
+        {
+            var redisclient = new RedisClient("localhost", 6379);
+            IRedisTypedClient<List<PhoneBook>> phoneBooks = redisclient.As<List<PhoneBook>>();
+
+            redisclient.Remove(key);
         }
 
     }
