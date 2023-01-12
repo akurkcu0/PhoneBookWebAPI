@@ -1,4 +1,4 @@
-﻿namespace PhoneBookWebAPI.Controllers.Models.Entities
+﻿namespace PhoneBookWebAPI.Models.Entities
 {
     public class PhoneBook
     {
@@ -6,6 +6,6 @@
         public string Name { get; set; }
         public string Lastname { get; set; }
         public string CompanyName { get; set; }
-        public ICollection<ContactInformation> contactInformations { get; } 
+        public ICollection<ContactInformation> contactInformations { get; }
     }
 }

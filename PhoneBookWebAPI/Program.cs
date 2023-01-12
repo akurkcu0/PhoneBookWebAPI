@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using PhoneBookWebAPI.Controllers.Models.Context;
-using PhoneBookWebAPI.Controllers.Models.Mapping;
+using PhoneBookWebAPI.Models.Context;
+using PhoneBookWebAPI.Models.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,4 +1,4 @@
-﻿namespace PhoneBookWebAPI.Controllers.Models.Entities
+﻿namespace PhoneBookWebAPI.Models.Entities
 {
     public class ContactInformation
     {

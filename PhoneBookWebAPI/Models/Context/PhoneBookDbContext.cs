@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PhoneBookWebAPI.Controllers.Models.Entities;
+using PhoneBookWebAPI.Models.Entities;
 
-namespace PhoneBookWebAPI.Controllers.Models.Context
+namespace PhoneBookWebAPI.Models.Context
 {
     public class PhoneBookDbContext : DbContext
     {

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using PhoneBookWebAPI.Controllers.Models.Dtos;
-using PhoneBookWebAPI.Controllers.Models.Entities;
+using PhoneBookWebAPI.Models.Dtos;
+using PhoneBookWebAPI.Models.Entities;
 
-namespace PhoneBookWebAPI.Controllers.Models.Mapping
+namespace PhoneBookWebAPI.Models.Mapping
 {
     public class MappingProfile : Profile
     {

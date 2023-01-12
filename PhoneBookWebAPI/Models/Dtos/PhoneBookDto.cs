@@ -1,4 +1,4 @@
-﻿namespace PhoneBookWebAPI.Controllers.Models.Dtos
+﻿namespace PhoneBookWebAPI.Models.Dtos
 {
     public class PhoneBookDto
     {
