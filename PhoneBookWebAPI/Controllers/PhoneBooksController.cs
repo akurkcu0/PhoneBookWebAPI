@@ -27,6 +27,8 @@ namespace PhoneBookWebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(PhoneBookDto phoneBookDto)
         {
+            if (phoneBookDto == null) return BadRequest();
+
             PhoneBook phoneBook = _mapper.Map<PhoneBook>(phoneBookDto);
 
             await _context.phoneBooks.AddAsync(phoneBook);
@@ -40,6 +42,8 @@ namespace PhoneBookWebAPI.Controllers
         [HttpPut("id")]
         public async Task<IActionResult> Put(int id ,PhoneBookDto phoneBookDto)
         {
+            if (phoneBookDto == null) return BadRequest();
+
             PhoneBook phoneBook = await _context.phoneBooks.FindAsync(id);
             phoneBook.Name= phoneBookDto.Name;
             phoneBook.Lastname= phoneBookDto.Lastname;
@@ -55,6 +59,8 @@ namespace PhoneBookWebAPI.Controllers
         [HttpDelete("id")]
         public async Task<IActionResult> Delete(int id)
         {
+            if (id == 0) return BadRequest();
+
             PhoneBook phoneBook = await _context.phoneBooks.FindAsync(id);
 
             _context.Remove(phoneBook);
@@ -73,6 +79,7 @@ namespace PhoneBookWebAPI.Controllers
             if (phoneBooksList == null)
             {
                 phoneBooksList = await _context.phoneBooks.Include(p => p.contactInformations).ToListAsync();
+                if (phoneBooksList == null) return BadRequest();
                 SetCache<List<PhoneBook>>("phoneBooks", phoneBooksList);
             }
 
