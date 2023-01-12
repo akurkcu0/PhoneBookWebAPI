@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PhoneBookWebAPI.Controllers.Models.Context;
+using PhoneBookWebAPI.Controllers.Models.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,8 @@ builder.Services.AddDbContext<PhoneBookDbContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
+
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 // Add services to the container.
 
 builder.Services.AddControllers();
