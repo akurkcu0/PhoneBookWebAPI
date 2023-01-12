@@ -32,7 +32,7 @@ namespace PhoneBookWebAPI.Controllers
             await _context.phoneBooks.AddAsync(phoneBook);
             await _context.SaveChangesAsync();
 
-            RemoveCache("phoneBooks");
+            RemoveCache<List<PhoneBook>>("phoneBooks");
 
             return Ok("Kayıt işlemi başarılı");
         }
@@ -47,7 +47,7 @@ namespace PhoneBookWebAPI.Controllers
 
             await _context.SaveChangesAsync();
 
-            RemoveCache("phoneBooks");
+            RemoveCache<List<PhoneBook>>("phoneBooks");
 
             return Ok("Güncelleme işlemi başarılı");
         }
@@ -60,7 +60,7 @@ namespace PhoneBookWebAPI.Controllers
             _context.Remove(phoneBook);
             await _context.SaveChangesAsync();
 
-            RemoveCache("phoneBooks");
+            RemoveCache<List<PhoneBook>>("phoneBooks");
 
             return Ok("Silme işlemi başarılı");
         }
@@ -69,23 +69,36 @@ namespace PhoneBookWebAPI.Controllers
         public async Task<IActionResult> Get()
         {
 
-            var redisclient = new RedisClient("localhost", 6379);
-            IRedisTypedClient<List<PhoneBook>> phoneBooks = redisclient.As<List<PhoneBook>>();
-
-            List<PhoneBook> phoneBooksList = redisclient.Get<List<PhoneBook>>("phoneBooks");
+            List<PhoneBook> phoneBooksList = GetCache<List<PhoneBook>>("phoneBooks");
             if (phoneBooksList == null)
             {
                 phoneBooksList = await _context.phoneBooks.Include(p => p.contactInformations).ToListAsync();
-                redisclient.Set<List<PhoneBook>>("phoneBooks", phoneBooksList);
+                SetCache<List<PhoneBook>>("phoneBooks", phoneBooksList);
             }
 
             return Ok(phoneBooksList);
         }
 
-        void RemoveCache(string key)
+        T GetCache<T>(string key)
         {
             var redisclient = new RedisClient("localhost", 6379);
             IRedisTypedClient<List<PhoneBook>> phoneBooks = redisclient.As<List<PhoneBook>>();
+
+            return redisclient.Get<T>(key);
+        }
+
+        void SetCache<T>(string key, T value)
+        {
+            var redisclient = new RedisClient("localhost", 6379);
+            IRedisTypedClient<List<PhoneBook>> phoneBooks = redisclient.As<List<PhoneBook>>();
+
+            redisclient.Set<T>(key, value);
+        }
+
+        void RemoveCache<T>(string key)
+        {
+            var redisclient = new RedisClient("localhost", 6379);
+            IRedisTypedClient<T> phoneBooks = redisclient.As<T>();
 
             redisclient.Remove(key);
         }
